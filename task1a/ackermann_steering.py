@@ -37,11 +37,32 @@ WHEELBASE = 0.120           # L: distance between front and rear axle centreline
 TRACK_WIDTH = 0.110         # W: distance between left and right wheel centre
 WHEEL_OFFSET = 0.0275       # O: distance between kingpin axis and wheel centre.
 ##############################################################
+import math
+
+def ackermann_wheel_angles(delta):
+    # ==========================================
+    # --- ADD YOUR IMPLEMENTATION HERE ---
+    # ==========================================
+    
+    # Handle straight motion (zero/near-zero angle) to prevent division by zero
+    if abs(delta) < 1e-6:
+        return 0.0, 0.0
+
+    # Calculate center radius of curvature
+    R = WHEELBASE / math.tan(delta)
+
+    # Calculate individual left and right front wheel angles
+    left_wheel_angle = math.atan(WHEELBASE / (R - TRACK_WIDTH / 2.0))
+    right_wheel_angle = math.atan(WHEELBASE / (R + TRACK_WIDTH / 2.0))
+
+    return left_wheel_angle, right_wheel_angle
+
+    # ==========================================
+    # --- END OF YOUR IMPLEMENTATION ---
+    # ==========================================
 
 
-##############################################################
-############### ADD YOUR IMPLEMENTATION HERE #################
-##############################################################
+
 
 
 def ackermann_wheel_angles(delta):
