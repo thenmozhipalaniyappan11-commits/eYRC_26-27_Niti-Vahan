@@ -46,7 +46,6 @@ WHEEL_OFFSET = 0.0275       # O: distance between kingpin axis and wheel centre.
 ############### ADD YOUR IMPLEMENTATION HERE #################
 ##############################################################
 
-
 def ackermann_wheel_angles(delta):
     '''
     Purpose:
@@ -70,24 +69,40 @@ def ackermann_wheel_angles(delta):
     ---
     WHEEL_OFFSET changes the effective half-track width inside each wheel's triangle.
     '''
-    # Straight-line / neutral steering condition
-    if math.isclose(delta, 0.0, abs_tol=1e-7):
+
+    # Handle straight motion
+    if abs(delta) < 1e-12:
         return 0.0, 0.0
 
-    # Effective half track width considering the kingpin axis / wheel offset
-    effective_half_track = (TRACK_WIDTH / 2.0) - WHEEL_OFFSET
+    # Effective half-track considering the wheel offset
+    half_track = (TRACK_WIDTH / 2.0) - WHEEL_OFFSET
 
-    # Turning radius measured from the vehicle center to the Instantaneous Center of Rotation (ICR)
-    R = WHEELBASE / math.tan(delta)
+    # Radius of the virtual centred wheel
+    radius = WHEELBASE / math.tan(abs(delta))
 
-    # Calculate inner and outer wheel steering angles based on Ackermann geometry
-    # Left turn (delta > 0): Left wheel is inside (R_left = R - track_offset), Right wheel is outside (R_right = R + track_offset)
-    # Right turn (delta < 0): Right wheel is inside, Left wheel is outside
-    left_angle = math.atan(WHEELBASE / (R - effective_half_track))
-    right_angle = math.atan(WHEELBASE / (R + effective_half_track))
+    # Inner and outer turning radii
+    inner_radius = radius - half_track
+    outer_radius = radius + half_track
+
+    # Calculate the corresponding wheel angles
+    inner_angle = math.atan2(WHEELBASE, inner_radius)
+    outer_angle = math.atan2(WHEELBASE, outer_radius)
+
+    # Positive delta = left turn
+    if delta > 0:
+        left_angle = inner_angle
+        right_angle = outer_angle
+
+    # Negative delta = right turn
+    else:
+        left_angle = -outer_angle
+        right_angle = -inner_angle
 
     return left_angle, right_angle
 
+   
+
+   
 
 ##############################################################
 ################ END OF YOUR IMPLEMENTATION ##################
