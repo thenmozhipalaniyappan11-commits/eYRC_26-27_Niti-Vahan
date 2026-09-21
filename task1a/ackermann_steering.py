@@ -42,6 +42,56 @@ WHEEL_OFFSET = 0.0275       # O: distance between kingpin axis and wheel centre.
 ##############################################################
 ############### ADD YOUR IMPLEMENTATION HERE #################
 ##############################################################
+##############################################################
+############### ADD YOUR IMPLEMENTATION HERE #################
+##############################################################
+
+
+def ackermann_wheel_angles(delta):
+    '''
+    Purpose:
+    ---
+    Convert a single virtual steering angle into the two real front-wheel
+    angles, per the Ackermann geometry.
+
+    Input Arguments:
+    ---
+    `delta` :   [ float ]
+        Steering angle of the virtual centred front wheel, in radians.
+
+    Returns:
+    ---
+    `left_angle`  : [ float ]
+    `right_angle` : [ float ]
+        The two real front-wheel steering angles, in radians, using the
+        same sign convention as delta.
+
+    REMEMBER:
+    ---
+    WHEEL_OFFSET changes the effective half-track width inside each wheel's triangle.
+    '''
+    # Straight-line / neutral steering condition
+    if math.isclose(delta, 0.0, abs_tol=1e-7):
+        return 0.0, 0.0
+
+    # Effective half track width considering the kingpin axis / wheel offset
+    effective_half_track = (TRACK_WIDTH / 2.0) - WHEEL_OFFSET
+
+    # Turning radius measured from the vehicle center to the Instantaneous Center of Rotation (ICR)
+    R = WHEELBASE / math.tan(delta)
+
+    # Calculate inner and outer wheel steering angles based on Ackermann geometry
+    # Left turn (delta > 0): Left wheel is inside (R_left = R - track_offset), Right wheel is outside (R_right = R + track_offset)
+    # Right turn (delta < 0): Right wheel is inside, Left wheel is outside
+    left_angle = math.atan(WHEELBASE / (R - effective_half_track))
+    right_angle = math.atan(WHEELBASE / (R + effective_half_track))
+
+    return left_angle, right_angle
+
+
+##############################################################
+################ END OF YOUR IMPLEMENTATION ##################
+##############################################################
 
 
 def ackermann_wheel_angles(delta):
